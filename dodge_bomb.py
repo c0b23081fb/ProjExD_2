@@ -111,13 +111,13 @@ def main():
     tmr = 0
     
     while True:
-        a,b,c,d = update_bomb(tmr,vx,vy,bb_rct,bb_lst,acc_lst)
+        b_img,ax,ay,b_rct = update_bomb(tmr,vx,vy,bb_rct,bb_lst,acc_lst)
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
 
-        if kk_rct.colliderect(d):  # こうかとんと爆弾が重なっていたら
+        if kk_rct.colliderect(b_rct):  # こうかとんと爆弾が重なっていたら
             game_over(screen, kk_rct)
             return
 
@@ -136,7 +136,7 @@ def main():
         screen.blit(kk_img, kk_rct)
 
         
-        bb_rct.move_ip(b,c)
+        bb_rct.move_ip(ax,ay)
 
 
         yoko,tate = check_bound(bb_rct)
@@ -145,7 +145,7 @@ def main():
         if not tate:
             vy *= -1
             
-        screen.blit(a, d)
+        screen.blit(b_img, b_rct)
 
         pg.display.update()
         tmr += 1
