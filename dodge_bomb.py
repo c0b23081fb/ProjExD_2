@@ -52,7 +52,7 @@ def create_bomb_lists():
     
     return bb_imgs, accs
 
-def update_bomb(tmr, vx, vy, bb_rct, bb_imgs, accs):
+def update_bomb(tmr, initial_velocity_x, initial_velocity_y, bb_rct, bb_imgs, accs):
     """
     時間経過に応じて爆弾のサイズと速度を更新する。
     tmr: タイマーの値
@@ -64,8 +64,8 @@ def update_bomb(tmr, vx, vy, bb_rct, bb_imgs, accs):
     index = min(tmr // 100, 9)  # 最大で9を超えないようにする
 
     # 速度の更新
-    avx = vx * accs[index]
-    avy = vy * accs[index]
+    avx = initial_velocity_x * accs[index]
+    avy = initial_velocity_y * accs[index]
     # print(avx, avy)
     
     # 爆弾のサイズ更新
