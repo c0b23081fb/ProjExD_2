@@ -12,6 +12,19 @@ DELTA = {pg.K_UP:(0,-5),
          }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def game_over(screen, kk_img, kk_rct):
+    """Game Over画面を表示"""
+    screen.fill((0, 0, 0))  # 画面を黒くする
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)  # 泣いているこうかとんの画像に切替
+    font = pg.font.Font(None, 80)
+    text = font.render("Game Over", True, (255, 0, 0))
+    screen.blit(kk_img, kk_rct)
+    screen.blit(text, (WIDTH // 2 - 150, HEIGHT // 2 - 40))
+    pg.display.update()
+    pg.time.wait(5000)  # 5秒間表示する
+
+
+
 
 def check_bound(obj_rct : pg.Rect) -> tuple[bool,bool]:
     """
@@ -50,6 +63,7 @@ def main():
         screen.blit(bg_img, [0, 0]) 
 
         if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾が重なっていたら
+            game_over(screen, kk_img, kk_rct)
             return
 
         key_lst = pg.key.get_pressed()
