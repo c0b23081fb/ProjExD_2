@@ -74,6 +74,18 @@ def update_bomb(tmr, vx, vy, bb_rct, bb_imgs, accs):
     
     return bb_img, avx, avy, bb_rct
 
+def get_kk_images():
+    """各方向に応じたこうかとん画像の辞書を作成"""
+    kk_images = {}
+    kk_images[(0, -5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(+5,-5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(+5, 0)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(+5,+5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(0,+5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(-5,+5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(-5,0)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_images[(-5,-5)] = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    return kk_images
 
 
 
