@@ -49,6 +49,9 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
 
+        if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾が重なっていたら
+            return
+
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
         for key,tpl in DELTA.items():
@@ -69,6 +72,7 @@ def main():
             vx *= -1
         if not tate:
             vy *= -1
+            
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
