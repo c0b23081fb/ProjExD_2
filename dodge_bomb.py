@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -12,16 +13,67 @@ DELTA = {pg.K_UP:(0,-5),
          }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-def game_over(screen, kk_img, kk_rct):
-    """Game Over画面を表示"""
-    screen.fill((0, 0, 0))  # 画面を黒くする
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)  # 泣いているこうかとんの画像に切替
+def game_over(screen, kk_rct):
+    """ゲームオーバー時の画面を表示"""
+    # 画面全体を黒で塗りつぶす
+    blackout = pg.Surface((WIDTH, HEIGHT))
+    blackout.fill((0, 0, 0))
+    blackout.set_alpha(150)  # 半透明にする
+    screen.blit(blackout, (0, 0))
+
+    # 泣いているこうかとんの画像を表示
+    sad_kk_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    screen.blit(sad_kk_img, kk_rct)
+
+    # Game Overの文字を表示
     font = pg.font.Font(None, 80)
     text = font.render("Game Over", True, (255, 0, 0))
-    screen.blit(kk_img, kk_rct)
-    screen.blit(text, (WIDTH // 2 - 150, HEIGHT // 2 - 40))
+    text_rct = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+    screen.blit(text, text_rct)
+
+    # 画面更新
     pg.display.update()
-    pg.time.wait(5000)  # 5秒間表示する
+
+    # 5秒間表示する
+    time.sleep(5)
+
+def create_bomb_lists():
+    """爆弾の拡大と加速のリストを作成し、それらをタプルとして返す"""
+    # 速度のリスト (1～10の加速度)
+    accs = [a for a in range(1, 11)]
+    
+    # 爆弾サイズ（拡大したSurface）のリスト
+    bb_imgs = []
+    for r in range(1, 11):
+        bb_img = pg.Surface((20 * r, 20 * r))  # 爆弾のSurfaceを作成
+        bb_img.set_colorkey((0, 0, 0))  # 背景を透過
+        pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)  # 爆弾を描画
+        bb_imgs.append(bb_img)
+    
+    return bb_imgs, accs
+
+def update_bomb(tmr, vx, vy, bb_rct, bb_imgs, accs):
+    """
+    時間経過に応じて爆弾のサイズと速度を更新する。
+    tmr: タイマーの値
+    vx, vy: 爆弾の初期速度
+    bb_rct: 爆弾のRect
+    bb_imgs: 拡大爆弾Surfaceのリスト
+    accs: 加速度のリスト
+    """
+    index = min(tmr // 100, 9)  # 最大で9を超えないようにする
+
+    # 速度の更新
+    avx = vx * accs[index]
+    avy = vy * accs[index]
+    # print(avx, avy)
+    
+    # 爆弾のサイズ更新
+    bb_img = bb_imgs[index]
+    bb_rct = bb_img.get_rect(center=bb_rct.center)  # 中心座標を維持したまま新しいサイズに更新
+    
+    return bb_img, avx, avy, bb_rct
+
 
 
 
@@ -51,19 +103,22 @@ def main():
     bb_img.set_colorkey((0,0,0))  # 爆弾の四隅の色を透過させる
     pg.draw.circle(bb_img,(255,0,0),(10,10),10)
     bb_rct = bb_img.get_rect()  # 爆弾レクトの抽出
+    bb_lst,acc_lst = create_bomb_lists()
     bb_rct.centerx = random.randint(0,WIDTH)
     bb_rct.centery = random.randint(0,HEIGHT)
     vx,vy = +5,+5
     clock = pg.time.Clock()
     tmr = 0
+    
     while True:
+        a,b,c,d = update_bomb(tmr,vx,vy,bb_rct,bb_lst,acc_lst)
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
         screen.blit(bg_img, [0, 0]) 
 
-        if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾が重なっていたら
-            game_over(screen, kk_img, kk_rct)
+        if kk_rct.colliderect(d):  # こうかとんと爆弾が重なっていたら
+            game_over(screen, kk_rct)
             return
 
         key_lst = pg.key.get_pressed()
@@ -79,7 +134,10 @@ def main():
 
         
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx,vy)
+
+        
+        bb_rct.move_ip(b,c)
+
 
         yoko,tate = check_bound(bb_rct)
         if not yoko:
@@ -87,7 +145,8 @@ def main():
         if not tate:
             vy *= -1
             
-        screen.blit(bb_img, bb_rct)
+        screen.blit(a, d)
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
